@@ -89,6 +89,8 @@ export default function Dashboard() {
             <DataGrid
               data={activeTab === 'air' ? airData : waterData}
               type={activeTab}
+              startDate={startDate}
+              endDate={endDate}
             />
           </div>
         </>
