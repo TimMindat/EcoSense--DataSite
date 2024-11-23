@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Activity, Droplets } from 'lucide-react';
 import { subYears } from 'date-fns';
 import DataGrid from './DataGrid';
 import SearchBar from './SearchBar';
 import Analytics from './Analytics';
+import Chart from './Chart';
 import { fetchAirQualityData, fetchWaterQualityData } from '../services/api';
-import { exportToCSV } from '../utils/export';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<'air' | 'water'>('air');
@@ -30,10 +29,6 @@ export default function Dashboard() {
     setEndDate(end);
   };
 
-  const handleExport = () => {
-    exportToCSV(activeTab === 'air' ? airData : waterData, activeTab);
-  };
-
   return (
     <div className="container mx-auto px-4 py-8">
       <SearchBar
@@ -47,38 +42,22 @@ export default function Dashboard() {
       ) : (
         <>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h3 className="text-lg font-semibold mb-4">Air Quality Trends</h3>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={airData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="timestamp" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="aqi" stroke="#8884d8" />
-                    <Line type="monotone" dataKey="pm25" stroke="#82ca9d" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-            <div className="bg-white p-6 rounded-lg shadow-lg">
-              <h3 className="text-lg font-semibold mb-4">Water Quality Metrics</h3>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={waterData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="timestamp" />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="ph" stroke="#ff7300" />
-                    <Line type="monotone" dataKey="turbidity" stroke="#387908" />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+            <Chart
+              data={airData}
+              title="Air Quality Trends"
+              lines={[
+                { key: 'aqi', color: '#8884d8', name: 'AQI' },
+                { key: 'pm25', color: '#82ca9d', name: 'PM2.5' }
+              ]}
+            />
+            <Chart
+              data={waterData}
+              title="Water Quality Metrics"
+              lines={[
+                { key: 'ph', color: '#ff7300', name: 'pH' },
+                { key: 'turbidity', color: '#387908', name: 'Turbidity' }
+              ]}
+            />
           </div>
 
           <div className="bg-white rounded-lg shadow-lg p-6">
